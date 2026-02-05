@@ -4,49 +4,39 @@ import type {
   DataAuth,
   MetaAuth,
   LoginEmailRequest,
-  LoginUsernameRequest
-} from "@/interfaces";
-import api, { config, TIMEOUT } from "./api";
+  LoginUsernameRequest,
+} from '@/interfaces';
+import api, { createConfig, TIMEOUT } from './api';
 
 export const regist = async (registData: AuthRequest) => {
-  config.withCredentials = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.post<SuccessResponse<DataAuth, MetaAuth>>(
     '/auth/regist',
     registData,
-    config
+    createConfig(),
   );
 };
 
 export const loginEmail = async (loginEmailData: LoginEmailRequest) => {
-  config.withCredentials = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.post<SuccessResponse<DataAuth, MetaAuth>>(
     '/auth/login/email',
     loginEmailData,
-    config
+    createConfig(),
   );
 };
 
-export const loginUsername = async (loginUsernameData: LoginUsernameRequest) => {
-  config.withCredentials = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
+export const loginUsername = async (
+  loginUsernameData: LoginUsernameRequest,
+) => {
   return await api.post<SuccessResponse<DataAuth, MetaAuth>>(
     '/auth/login/username',
     loginUsernameData,
-    config
+    createConfig(),
   );
 };
 
 export const refreshToken = async () => {
-  config.withCredentials = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.get<SuccessResponse<Pick<DataAuth, 'token'>, MetaAuth>>(
     '/auth/refresh',
-    config
+    createConfig(),
   );
 };

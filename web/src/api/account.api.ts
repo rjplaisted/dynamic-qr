@@ -2,85 +2,66 @@ import type {
   Account,
   ChangePasswordRequest,
   SuccessResponse,
-  UpdateAccountRequest
-} from "@/interfaces";
-import api, { config, TIMEOUT } from "./api";
+  UpdateAccountRequest,
+} from '@/interfaces';
+import api, { createConfig, TIMEOUT } from './api';
 
 export const fetchUser = async (username: string) => {
-  return await api.get<SuccessResponse<Omit<Account, 'email'>>>(`/who/${username}`);
+  return await api.get<SuccessResponse<Omit<Account, 'email'>>>(
+    `/who/${username}`,
+  );
 };
 
 export const fetchAccount = async () => {
-  config.withCredentials = true;
-  config.requireAuth = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.get<SuccessResponse<Account>>(
     '/user',
-    config
+    createConfig({ requireAuth: true }),
   );
 };
 
 export const updateAccount = async (updateData: UpdateAccountRequest) => {
-  config.withCredentials = true;
-  config.requireAuth = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.put(
     '/user/update',
     updateData,
-    config
+    createConfig({ requireAuth: true }),
   );
 };
 
-export const changePassword = async (changePasswordData: ChangePasswordRequest) => {
-  config.withCredentials = true;
-  config.requireAuth = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
+export const changePassword = async (
+  changePasswordData: ChangePasswordRequest,
+) => {
   return await api.put(
     '/user/changepassword',
     changePasswordData,
-    config
+    createConfig({ requireAuth: true }),
   );
 };
 
 export const deleteAccount = async (password: string) => {
-  config.withCredentials = true;
-  config.requireAuth = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
-  // since there's no place for data in delete's args, so we put it in config
-  config.data = {
-    password: password
-  };
-
   return await api.delete(
     '/user/remove',
-    config
+    createConfig({
+      requireAuth: true,
+      data: {
+        // since there's no place for data in delete's args, so we put it in config
+        password: password,
+      },
+    }),
   );
 };
 
 export const logout = async () => {
-  config.withCredentials = true;
-  config.requireAuth = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.post(
     '/user/logout',
     undefined,
-    config
+    createConfig({ requireAuth: true }),
   );
 };
 
 export const logoutEverywhere = async () => {
-  config.withCredentials = true;
-  config.requireAuth = true;
-  config.signal = AbortSignal.timeout(TIMEOUT);
-
   return await api.post(
     '/user/logoutall',
     undefined,
-    config
+    createConfig({ requireAuth: true }),
   );
 };
