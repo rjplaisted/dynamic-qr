@@ -53,7 +53,7 @@ UserSchema.pre('save', async function (next) {
     return next();
   }
 
-  const passwordHash = await bcrypt.hash(this.password, 8);
+  const passwordHash = await bcrypt.hash(this.password, 12);
   this.password = passwordHash;
   next();
 });

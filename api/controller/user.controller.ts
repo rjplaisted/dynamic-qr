@@ -68,8 +68,8 @@ export const updateUser = async (
 
     const user = await UserService.getById(claimId);
     if (
-      user.name === data.name ||
-      user.username === data.username ||
+      user.name === data.name &&
+      user.username === data.username &&
       user.email === data.email
     ) {
       throw new ErrorCapture(
