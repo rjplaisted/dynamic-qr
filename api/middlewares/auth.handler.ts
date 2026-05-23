@@ -4,43 +4,43 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 import { IUrl, IUser } from '../models';
-import base from "../ssr/base";
+import base from '../ssr/base';
 import { createApp } from '../ssr/template';
 
 import { ErrorCapture } from '../utils/error_capture';
 import {
   accessExp,
   accessKey,
-  appUrl,
+  apiUrl,
   originExp,
   originKey,
   refreshExp,
-  refreshKey
+  refreshKey,
 } from '../utils/envs';
 
 export interface IClaims {
-  id: string,
-  ua?: string,
-  pk?: string,
-  iat: number,
-  exp: number
-};
+  id: string;
+  ua?: string;
+  pk?: string;
+  iat: number;
+  exp: number;
+}
 
 export const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   maxAge: refreshExp * 1000,
-  sameSite: "none"
+  sameSite: 'none',
 };
 
 // checking token
 export const isUserAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.get("Authorization");
+    const authHeader = req.get('Authorization');
     if (!authHeader) {
       throw new ErrorCapture('access token is missing or invalid', 401);
     }
-  
+
     const authHeaderPart = authHeader.split(' ');
     if (authHeaderPart.length !== 2 || authHeaderPart[0] !== 'Bearer') {
       throw new ErrorCapture('access token is missing or invalid', 401);
@@ -75,10 +75,10 @@ export const extractPassKey = async (req: Request, res: Response, next: NextFunc
     const claims = <IClaims>jwt.verify(originToken, originKey);
     if (!claims || !claims.pk || !claims.iat || !claims.exp) {
       // if theres no `pk` or jwt expired then re-auth manually
-      return next()
+      return next();
     }
 
-    req.passKey = claims.pk
+    req.passKey = claims.pk;
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -90,27 +90,27 @@ export const extractPassKey = async (req: Request, res: Response, next: NextFunc
 };
 
 export const createPassPage = async (url: IUrl) => {
-  await url.populate<{user: IUser}>('owner', 'name username');
+  await url.populate<{ user: IUser }>('owner', 'name username');
   const { username } = url.owner as unknown as IUser;
-  
-  const link = `${appUrl}/auth/redirect/${url.id}`;
+
+  const link = `${apiUrl}/auth/redirect/${url.id}`;
   const app = createApp(link, username);
   const html = await renderToString(app);
 
   return base(html);
-}
+};
 
 // token generator
 export const createOriginToken = (passKey: string) => {
   try {
     const originToken = jwt.sign(
       {
-        pk: passKey
+        pk: passKey,
       },
       originKey,
       {
-        expiresIn: originExp
-      }
+        expiresIn: originExp,
+      },
     );
 
     return originToken;
@@ -121,12 +121,8 @@ export const createOriginToken = (passKey: string) => {
 
 export const createAccessToken = (userId: string) => {
   try {
-    const accessToken = jwt.sign(
-      {id: userId},
-      accessKey,
-      {expiresIn: accessExp}
-    );
-  
+    const accessToken = jwt.sign({ id: userId }, accessKey, { expiresIn: accessExp });
+
     return accessToken;
   } catch (error) {
     throw new ErrorCapture((error as Error).message, 500);
@@ -138,21 +134,24 @@ export const createRefreshToken = (userId: string, userAgent: string) => {
     const refreshToken = jwt.sign(
       {
         id: userId,
-        ua: userAgent
+        ua: userAgent,
       },
       refreshKey,
       {
-        expiresIn: refreshExp
-      }
+        expiresIn: refreshExp,
+      },
     );
 
-    const refreshTokenHash = crypto.createHmac('sha256', refreshKey).update(refreshToken).digest('hex');
-  
+    const refreshTokenHash = crypto
+      .createHmac('sha256', refreshKey)
+      .update(refreshToken)
+      .digest('hex');
+
     return {
       refreshToken,
-      refreshTokenHash
+      refreshTokenHash,
     };
   } catch (error) {
     throw new ErrorCapture((error as Error).message, 500);
   }
-}
+};

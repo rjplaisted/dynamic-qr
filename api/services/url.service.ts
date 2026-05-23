@@ -1,17 +1,17 @@
-import { ObjectId, SaveOptions } from "mongoose";
-import { nanoid } from "nanoid";
+import { ObjectId, SaveOptions } from 'mongoose';
+import { nanoid } from 'nanoid';
 
-import { IUrl, UrlDB } from "../models";
+import { IUrl, UrlDB } from '../models';
 
-import { ErrorCapture } from "../utils/error_capture";
-import { logTimestamp } from "../utils/log";
-import { appUrl } from "../utils/envs";
+import { ErrorCapture } from '../utils/error_capture';
+import { logTimestamp } from '../utils/log';
+import { apiUrl } from '../utils/envs';
 
 export const create = (data: IUrl) => {
   const id = nanoid(8);
   const passKey = !!data.password ? nanoid(16) : undefined;
 
-  const short = `${appUrl}/o/${id}`;
+  const short = `${apiUrl}/o/${id}`;
 
   return new UrlDB({
     _id: id,
@@ -22,7 +22,7 @@ export const create = (data: IUrl) => {
     password: data.password,
     passKey: passKey,
     description: data.description,
-    owner: data.owner
+    owner: data.owner,
   });
 };
 
@@ -34,10 +34,9 @@ export const getById = async (id: string | ObjectId) => {
 };
 
 export const getSomeByOwner = async (ownerId: string | ObjectId, filter?: object) => {
-  const urls = await UrlDB.find(
-    Object.assign({owner: ownerId}, filter),
-    ('-owner')
-  ).sort('-updatedAt');
+  const urls = await UrlDB.find(Object.assign({ owner: ownerId }, filter), '-owner').sort(
+    '-updatedAt',
+  );
 
   return urls;
 };
@@ -48,7 +47,7 @@ export const saveUpdate = async (url: IUrl, options?: SaveOptions) => {
   }
 
   url = await url.save({
-    timestamps: options?.timestamps ?? true
+    timestamps: options?.timestamps ?? true,
   });
   return url;
 };
@@ -56,13 +55,14 @@ export const saveUpdate = async (url: IUrl, options?: SaveOptions) => {
 export const destroy = async (shortId: string | ObjectId, ownerId: string | ObjectId) => {
   const res = await UrlDB.deleteOne({
     _id: shortId,
-    owner: ownerId
+    owner: ownerId,
   });
 
   if (!res.deletedCount) throw new ErrorCapture('link is not exist in your account', 404);
 };
 
 export const destroyAllOwned = (ownerId: string | ObjectId) => {
-  UrlDB.deleteMany({owner: ownerId})
-  .then(res => logTimestamp(`Successfully removed ${res.deletedCount} urls belonging to ${ownerId}`));
+  UrlDB.deleteMany({ owner: ownerId }).then((res) =>
+    logTimestamp(`Successfully removed ${res.deletedCount} urls belonging to ${ownerId}`),
+  );
 };

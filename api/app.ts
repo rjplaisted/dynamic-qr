@@ -6,16 +6,11 @@ import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 
 import ConnectDB from './config/db.config';
-import {
-  AuthRouter,
-  OriginUrlRouter,
-  UrlRouter,
-  UserRouter
-} from './routes';
+import { AuthRouter, OriginUrlRouter, UrlRouter, UserRouter } from './routes';
 import { ErrorHandler, ResponseHandler, Logger } from './middlewares';
 
 import { corsOptions } from './utils/cors.options';
-import { appPort } from './utils/envs';
+import { apiPort } from './utils/envs';
 
 const app: Application = express();
 const server: http.Server = http.createServer(app);
@@ -24,10 +19,10 @@ const workdir = path.dirname(fileURLToPath(import.meta.url));
 const staticAssets = express.static(path.join(workdir, 'ssr/'));
 app.use(staticAssets);
 
-app.set("trust proxy", "127.0.0.1");
+app.set('trust proxy', '127.0.0.1');
 app.use(json());
 app.use(cookieParser());
-app.use(urlencoded({extended: true}));
+app.use(urlencoded({ extended: true }));
 
 app.use('/o', OriginUrlRouter);
 app.use('/auth', cors(corsOptions), AuthRouter);
@@ -36,9 +31,8 @@ app.use('/url', cors(corsOptions), UrlRouter);
 
 // check connection
 app.get('/ping', (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ping: 'pong'});
-  
-  res.logMessage = 'ping-pong'
+  res.status(200).json({ ping: 'pong' });
+  res.logMessage = 'ping-pong';
   return next();
 });
 
@@ -48,7 +42,7 @@ app.use(Logger);
 
 app.use(staticAssets);
 
-server.listen(appPort, async () => {
+server.listen(apiPort, async () => {
   await ConnectDB();
-  console.log(`server running on port: ${appPort}`);
+  console.log(`server running on port: ${apiPort}`);
 });
