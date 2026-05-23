@@ -51,7 +51,7 @@ On the other side (frontend).
 
 There are several environment that is needed by the App.
 
-1. Copy `.env.example` to `.env`.
+1. Copy [.env.example](.env.example) to `.env`.
 2. Update the values to match your environment.
 
 ## Installation
