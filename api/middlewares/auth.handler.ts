@@ -82,6 +82,11 @@ export const extractPassKey = async (req: Request, res: Response, next: NextFunc
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
+      // FIXME:
+      // When an origin token is expired/invalid,
+      // the intent (per the comment at line 77) is to simply re-authenticate
+      // identical to the !originToken case at line 71.
+      // An expired token should call next() without error, not abort the redirect with 401.
       next(new ErrorCapture('origin token is missing or invalid', 401));
     } else {
       next(error);

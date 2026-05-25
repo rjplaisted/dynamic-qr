@@ -1,16 +1,16 @@
-import type { AxiosError } from "axios";
+import type { AxiosError } from 'axios';
 
-import api, { MAX_ATTEMPT } from "./api";
-import { useAuthStore } from "@/stores";
-import type { CustomAxiosRequestConfig, ErrorResponse } from "@/interfaces";
+import api, { MAX_ATTEMPT, TIMEOUT } from './api';
+import { useAuthStore } from '@/stores';
+import type { CustomAxiosRequestConfig, ErrorResponse } from '@/interfaces';
 
-import { AuthStorage } from "@/utils/storage";
-import { catchError } from "@/utils/errorHandler";
+import { AuthStorage } from '@/utils/storage';
+import { catchError } from '@/utils/errorHandler';
 
 const plugAuthInterceptRequest = () => {
   api.interceptors.request.use(
     (config) => {
-      if ( (config as CustomAxiosRequestConfig).requireAuth ) {
+      if ((config as CustomAxiosRequestConfig).requireAuth) {
         const token = AuthStorage.auth;
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -24,7 +24,7 @@ const plugAuthInterceptRequest = () => {
       catchError(error);
 
       return Promise.reject(error);
-    }
+    },
   );
 };
 
@@ -46,12 +46,6 @@ const refreshAuthInterceptResponse = () => {
         api.interceptors.response.eject(interceptResponse);
 
         try {
-          config.refreshAttempt = config.refreshAttempt ?? 0;
-          if (config.refreshAttempt >= MAX_ATTEMPT) {
-            error.message = 'Max refresh attempt reached!';
-            throw new Error('Max refresh attempt reached!');
-          }
-
           const authStore = useAuthStore();
           await authStore.RefreshToken();
           const newToken = authStore.auth;
@@ -60,17 +54,20 @@ const refreshAuthInterceptResponse = () => {
             config.headers.Authorization = `Bearer ${newToken}`;
           }
 
-          config.refreshAttempt++;
           refreshAuthInterceptResponse();
 
+          config.signal = AbortSignal.timeout(TIMEOUT);
           return api(config);
         } catch (error) {
+          catchError(error);
           refreshAuthInterceptResponse();
+          return;
         }
       }
 
-      return Promise.reject(error);
-    }
+      catchError(error);
+      throw error;
+    },
   );
 };
 

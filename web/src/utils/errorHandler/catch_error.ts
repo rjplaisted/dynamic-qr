@@ -1,7 +1,8 @@
-import { HttpStatusCode, type AxiosError } from "axios";
+import { HttpStatusCode, type AxiosError } from 'axios';
 
-import type { CustomAxiosRequestConfig, ErrorResponse, Notif } from "@/interfaces";
-import { ClearStateAndStorage, useNotifStore } from "@/stores";
+import type { CustomAxiosRequestConfig, ErrorResponse, Notif } from '@/interfaces';
+import { ClearStateAndStorage, useNotifStore } from '@/stores';
+import router from '@/router';
 
 export function catchError(error: unknown) {
   const errorAxios = error as AxiosError;
@@ -10,8 +11,8 @@ export function catchError(error: unknown) {
   const notif: Notif = {
     status: 'error',
     title: 'oops, an error occurred.',
-    message: 'Help, error! error! error!'
-  }
+    message: 'Help, error! error! error!',
+  };
 
   if (errorAxios.response) {
     const config = errorAxios.config as CustomAxiosRequestConfig;
@@ -27,31 +28,25 @@ export function catchError(error: unknown) {
     }
 
     if (response.status === 403) {
-      // skip refresh error notif
-      if (config.url === '/auth/refresh') return;
-
       // for suddenly there is no refreshToken
-      notif.title = undefined;
+      notif.title = 'Session Expired';
       notif.message = "I'm sorry, you need to login again.";
 
       ClearStateAndStorage();
+      router.push({ name: 'login' });
     }
 
-    if (errorAxios.message === 'Max refresh attempt reached!') {
-      notif.title = undefined;
-      notif.message = "I'm sorry, you need to login again.";
-
-      ClearStateAndStorage();
-    };
-    
+    return notifStore.Notify(notif);
   } else if (errorAxios.request) {
     notif.title = errorAxios.name;
     notif.message = errorAxios.message;
-    
+
     if (errorAxios.code === 'ERR_CANCELED') {
       notif.message = 'Request cancelled due to timeout (10s).';
     }
-  }
 
-  return notifStore.Notify(notif);
+    return notifStore.Notify(notif);
+  } else {
+    return notifStore.Notify(notif);
+  }
 }

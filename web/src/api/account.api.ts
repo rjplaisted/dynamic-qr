@@ -8,7 +8,7 @@ import api, { createConfig, TIMEOUT } from './api';
 
 export const fetchUser = async (username: string) => {
   return await api.get<SuccessResponse<Omit<Account, 'email'>>>(
-    `/who/${username}`,
+    `/user/who/${username}`,
   );
 };
 

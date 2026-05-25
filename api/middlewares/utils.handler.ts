@@ -18,7 +18,7 @@ export const CheckUserAgent = async (req: Request, res: Response, next: NextFunc
     req.userAgent = userAgent;
     return next();
   } catch (error) {
-    return next(new ErrorCapture((error as Error).message, 500));
+    return next(error);
   }
 };
 

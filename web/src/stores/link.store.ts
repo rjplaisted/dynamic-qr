@@ -1,21 +1,11 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-import type {
-  Link,
-  LinkRequest,
-  UpdateLinkRequest
-} from "@/interfaces";
-import {
-  createLink,
-  deleteLink,
-  fetchLink,
-  fetchLinks,
-  updateLink
-} from "@/api";
+import type { Link, LinkRequest, UpdateLinkRequest } from '@/interfaces';
+import { createLink, deleteLink, fetchLink, fetchLinks, updateLink } from '@/api';
 
-import { codeToStatus } from "@/utils/converter";
-import { catchError } from "@/utils/errorHandler";
+import { codeToStatus } from '@/utils/converter';
+import { catchError } from '@/utils/errorHandler';
 
 export const useLinkStore = defineStore('link', () => {
   // state
@@ -40,9 +30,9 @@ export const useLinkStore = defineStore('link', () => {
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -50,14 +40,17 @@ export const useLinkStore = defineStore('link', () => {
     loading.value = true;
 
     try {
-      const { status, data: { data } } = await fetchLink(id);
+      const {
+        status,
+        data: { data },
+      } = await fetchLink(id);
       SetLink(data);
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -65,12 +58,15 @@ export const useLinkStore = defineStore('link', () => {
     loading.value = true;
 
     try {
-      const { status, data: { data } } = await fetchLinks();
+      const {
+        status,
+        data: { data },
+      } = await fetchLinks();
       ReplaceLinks(data);
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -86,7 +82,7 @@ export const useLinkStore = defineStore('link', () => {
         return codeToStatus(status);
       }
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -101,7 +97,7 @@ export const useLinkStore = defineStore('link', () => {
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -118,6 +114,6 @@ export const useLinkStore = defineStore('link', () => {
     GetLink,
     GetLinks,
     UpdateLink,
-    DeleteLink
-  }
+    DeleteLink,
+  };
 });

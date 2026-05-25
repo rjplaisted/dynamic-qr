@@ -42,7 +42,11 @@ app.use(Logger);
 
 app.use(staticAssets);
 
-server.listen(apiPort, async () => {
+async function run() {
   await ConnectDB();
+  server.listen(apiPort, () => {
   console.log(`server running on port: ${apiPort}`);
 });
+}
+
+run();

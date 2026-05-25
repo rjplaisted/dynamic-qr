@@ -1,22 +1,13 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 
-import type {
-  AuthRequest,
-  LoginEmailRequest,
-  LoginUsernameRequest
-} from "@/interfaces";
-import {
-  loginEmail,
-  loginUsername,
-  refreshToken,
-  regist
-} from "@/api";
-import { useAccountStore } from "./account.store";
+import type { AuthRequest, LoginEmailRequest, LoginUsernameRequest } from '@/interfaces';
+import { loginEmail, loginUsername, refreshToken, regist } from '@/api';
+import { useAccountStore } from './account.store';
 
-import { AuthStorage } from "@/utils/storage";
-import { codeToStatus } from "@/utils/converter";
-import { catchError } from "@/utils/errorHandler";
+import { AuthStorage } from '@/utils/storage';
+import { codeToStatus } from '@/utils/converter';
+import { catchError } from '@/utils/errorHandler';
 
 export const useAuthStore = defineStore('auth', () => {
   // state
@@ -41,19 +32,22 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
 
     try {
-      const { status, data: { data } } = await regist(registData);
+      const {
+        status,
+        data: { data },
+      } = await regist(registData);
       const { token, ...account } = data;
 
       const accountStore = useAccountStore();
       accountStore.ReplaceAccount(account);
 
       ReplaceAuth(token);
-  
+
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -61,19 +55,22 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
 
     try {
-      const { status, data: { data } } = await loginEmail(loginData);
+      const {
+        status,
+        data: { data },
+      } = await loginEmail(loginData);
       const { token, ...account } = data;
 
       const accountStore = useAccountStore();
       accountStore.ReplaceAccount(account);
 
       ReplaceAuth(token);
-  
+
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -81,28 +78,33 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
 
     try {
-      const { status, data: { data } } = await loginUsername(loginData);
+      const {
+        status,
+        data: { data },
+      } = await loginUsername(loginData);
       const { token, ...account } = data;
 
       const accountStore = useAccountStore();
       accountStore.ReplaceAccount(account);
 
       ReplaceAuth(token);
-  
+
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function RefreshToken() {
     try {
-      const { data: { data } } = await refreshToken();
+      const {
+        data: { data },
+      } = await refreshToken();
       ReplaceAuth(data.token);
     } catch (error) {
-      catchError(error);
+      throw error;
     }
   }
 
@@ -117,6 +119,6 @@ export const useAuthStore = defineStore('auth', () => {
     Regist,
     LoginEmail,
     LoginUsername,
-    RefreshToken
-  }
+    RefreshToken,
+  };
 });

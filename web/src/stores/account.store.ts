@@ -1,25 +1,21 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-import type {
-  Account,
-  ChangePasswordRequest,
-  UpdateAccountRequest
-} from "@/interfaces";
+import type { Account, ChangePasswordRequest, UpdateAccountRequest } from '@/interfaces';
 import {
   changePassword,
   deleteAccount,
   fetchAccount,
   logout,
   logoutEverywhere,
-  updateAccount
-} from "@/api";
+  updateAccount,
+} from '@/api';
 
-import { catchError } from "@/utils/errorHandler";
-import { codeToStatus } from "@/utils/converter";
+import { catchError } from '@/utils/errorHandler';
+import { codeToStatus } from '@/utils/converter';
 
 export const useAccountStore = defineStore('account', () => {
-  // state 
+  // state
   const account = ref<Account>();
   const loading = ref<boolean>(false);
 
@@ -32,12 +28,15 @@ export const useAccountStore = defineStore('account', () => {
     loading.value = true;
 
     try {
-      const { status, data: { data } } = await fetchAccount();
+      const {
+        status,
+        data: { data },
+      } = await fetchAccount();
       ReplaceAccount(data);
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -52,9 +51,9 @@ export const useAccountStore = defineStore('account', () => {
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -65,7 +64,7 @@ export const useAccountStore = defineStore('account', () => {
       const { status } = await changePassword(data);
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -79,7 +78,7 @@ export const useAccountStore = defineStore('account', () => {
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -93,7 +92,7 @@ export const useAccountStore = defineStore('account', () => {
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -107,7 +106,7 @@ export const useAccountStore = defineStore('account', () => {
 
       return codeToStatus(status);
     } catch (error) {
-      catchError(error);
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -123,6 +122,6 @@ export const useAccountStore = defineStore('account', () => {
     ChangePassword,
     DeleteAccount,
     Logout,
-    LogoutEverywhere
+    LogoutEverywhere,
   };
 });
