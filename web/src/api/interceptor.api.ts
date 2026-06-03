@@ -45,6 +45,7 @@ const refreshAuthInterceptResponse = () => {
       ) {
         api.interceptors.response.eject(interceptResponse);
 
+        const originalError = error;
         try {
           const authStore = useAuthStore();
           await authStore.RefreshToken();
@@ -58,10 +59,10 @@ const refreshAuthInterceptResponse = () => {
 
           config.signal = AbortSignal.timeout(TIMEOUT);
           return api(config);
-        } catch (error) {
-          catchError(error);
+        } catch (refreshError) {
+          catchError(refreshError);
           refreshAuthInterceptResponse();
-          return;
+          throw originalError;
         }
       }
 
