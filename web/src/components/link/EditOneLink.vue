@@ -158,7 +158,7 @@ const submitAction = async (v: Omit<UpdateLinkRequest, 'plusQr' | 'qrOptions'>) 
 
     <div class="space-y-4">
       <Separator />
-      <QrDesigner v-model="qrOptions" :preview-url="editLinkForm.values.originUrl ?? link?.originUrl" />
+      <QrDesigner v-model="qrOptions" :preview-url="link?.shortUrl" />
     </div>
 
     <DeleteLink />
