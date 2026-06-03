@@ -46,3 +46,17 @@ export const deleteLink = async (linkId: string) => {
     createConfig({ requireAuth: true }),
   );
 };
+
+export const downloadLinkQrSvg = async (linkId: string) => {
+  return await api.get(`/url/qr/${linkId}/svg`, {
+    ...createConfig({ requireAuth: true }),
+    responseType: 'blob',
+  });
+};
+
+export const downloadLinkQrPng = async (linkId: string) => {
+  return await api.get(`/url/qr/${linkId}/png`, {
+    ...createConfig({ requireAuth: true }),
+    responseType: 'blob',
+  });
+};

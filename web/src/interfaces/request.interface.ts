@@ -1,4 +1,4 @@
-import type { Account } from "./data.interface";
+import type { Account, QrOptions } from "./data.interface";
 
 export interface AuthRequest extends Account {
   password: string
@@ -21,7 +21,8 @@ export interface LinkRequest {
   isPrivate?: boolean,
   password?: string,
   description?: string,
-  plusQr?: boolean
+  plusQr?: boolean,
+  qrOptions?: Partial<QrOptions>
 }
 
 export type UpdateLinkRequest = Partial<LinkRequest>;

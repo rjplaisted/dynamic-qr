@@ -10,13 +10,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/vue";
 
 import type { Link } from "@/interfaces";
+import { downloadLinkQrSvg, downloadLinkQrPng } from "@/api";
 
 defineProps<{
   link: Link
 }>();
+
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+const onDownloadSvg = async (link: Link) => {
+  const res = await downloadLinkQrSvg(link._id);
+  downloadBlob(res.data as Blob, `qr-${link._id}.svg`);
+};
+
+const onDownloadPng = async (link: Link) => {
+  const res = await downloadLinkQrPng(link._id);
+  downloadBlob(res.data as Blob, `qr-${link._id}.png`);
+};
 </script>
 
 <template>
@@ -33,7 +54,7 @@ defineProps<{
         <p>{{ link.shortUrl }}</p>
       </CardDescription>
     </CardHeader>
-    <CardContent class="py-0 h-28 flex space-x-2 justify-between">
+    <CardContent class="py-0 flex space-x-2 justify-between" :class="link.qrCode ? 'h-auto' : 'h-28'">
       <div class="flex flex-col gap-y-1">
         <p class="inline-flex text-sm font-medium items-center gap-1">
           Original URL
@@ -43,9 +64,32 @@ defineProps<{
         </small>
       </div>
 
-      <img v-if="link.qrCode" :src="link.qrCode" alt="qr-code" class="w-auto h-24"/>
+      <div v-if="link.qrCode" class="flex flex-col items-center gap-1.5 flex-shrink-0">
+        <img :src="link.qrCode" alt="qr-code" class="w-auto h-24"/>
+        <div class="flex gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-6 px-2 text-xs gap-1"
+            @click="onDownloadPng(link)"
+            title="Download PNG"
+          >
+            <Icon icon="radix-icons:download" class="h-3 w-3" />
+            PNG
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-6 px-2 text-xs gap-1"
+            @click="onDownloadSvg(link)"
+            title="Download SVG vector"
+          >
+            <Icon icon="radix-icons:download" class="h-3 w-3" />
+            SVG
+          </Button>
+        </div>
+      </div>
       <img v-else src="/src/assets/error/no-picture.png" alt="no-qr-code" class="w-auto h-24"/>
-
     </CardContent>
     <CardFooter class="bottom-0 py-4">
       <small class="inline-flex items-center text-muted-foreground gap-1">

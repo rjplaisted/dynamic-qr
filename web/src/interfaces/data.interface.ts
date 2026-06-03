@@ -4,6 +4,16 @@ export interface Account {
   email: string
 }
 
+export interface QrOptions {
+  darkColor: string;
+  lightColor: string;
+  transparentBg: boolean;
+  moduleShape: 'square' | 'dot' | 'rounded';
+  errorLevel: 'L' | 'M' | 'Q' | 'H';
+  frameText?: string;
+  logo?: string;
+}
+
 export interface Link {
   _id: string,
   title: string,
@@ -14,6 +24,7 @@ export interface Link {
   description?: string,
   visitCount: number,
   qrCode?: string,
+  qrOptions?: QrOptions,
   createdAt: string,
   updatedAt: string
 }

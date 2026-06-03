@@ -22,6 +22,15 @@ export interface IUrl extends Document, SchemaTimestampsConfig {
   description?: string,
   visitCount: number,
   qrCode?: string,
+  qrOptions?: {
+    darkColor?: string;
+    lightColor?: string;
+    transparentBg?: boolean;
+    moduleShape?: string;
+    errorLevel?: string;
+    frameText?: string;
+    logo?: string;
+  },
   owner: ObjectId,
   comparePassword(password: string): Promise<boolean>,
   comparePassKey(passKey: string): boolean
@@ -71,6 +80,19 @@ const UrlSchema = new Schema<IUrl>({
   },
   qrCode: {
     type: String
+  },
+  qrOptions: {
+    type: {
+      darkColor: String,
+      lightColor: String,
+      transparentBg: Boolean,
+      moduleShape: String,
+      errorLevel: String,
+      frameText: String,
+      logo: String,
+    },
+    required: false,
+    _id: false,
   },
   owner: {
     type: Schema.Types.ObjectId,

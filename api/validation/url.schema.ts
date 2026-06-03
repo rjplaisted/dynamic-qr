@@ -1,12 +1,23 @@
 import { JSONSchemaType } from "ajv";
 
+export interface QrOptionsSchema {
+  darkColor?: string;
+  lightColor?: string;
+  transparentBg?: boolean;
+  moduleShape?: string;
+  errorLevel?: string;
+  frameText?: string;
+  logo?: string;
+}
+
 export interface UrlSchema {
   title?: string,
   originUrl?: string,
   isPrivate?: boolean,
   password?: string,
   description?: string,
-  plusQr?: boolean
+  plusQr?: boolean,
+  qrOptions?: QrOptionsSchema
 }
 
 type UrlCreateSchema = UrlSchema & {
@@ -45,6 +56,20 @@ export const urlCreateSchema: JSONSchemaType<UrlCreateSchema> = {
     plusQr: {
       type: "boolean",
       nullable: true
+    },
+    qrOptions: {
+      type: "object",
+      nullable: true,
+      additionalProperties: false,
+      properties: {
+        darkColor: { type: "string", nullable: true },
+        lightColor: { type: "string", nullable: true },
+        transparentBg: { type: "boolean", nullable: true },
+        moduleShape: { type: "string", nullable: true },
+        errorLevel: { type: "string", nullable: true },
+        frameText: { type: "string", nullable: true },
+        logo: { type: "string", nullable: true }
+      }
     }
   },
   if: {
@@ -102,6 +127,20 @@ export const urlUpdateSchema: JSONSchemaType<UrlSchema> = {
     plusQr: {
       type: "boolean",
       nullable: true
+    },
+    qrOptions: {
+      type: "object",
+      nullable: true,
+      additionalProperties: false,
+      properties: {
+        darkColor: { type: "string", nullable: true },
+        lightColor: { type: "string", nullable: true },
+        transparentBg: { type: "boolean", nullable: true },
+        moduleShape: { type: "string", nullable: true },
+        errorLevel: { type: "string", nullable: true },
+        frameText: { type: "string", nullable: true },
+        logo: { type: "string", nullable: true }
+      }
     }
   },
   additionalProperties: false,

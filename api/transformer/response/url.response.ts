@@ -11,6 +11,7 @@ export const urlResponse = (url: IUrl) => {
     description: url.description,
     visitCount: url.visitCount,
     qrCode: url.qrCode,
+    qrOptions: url.qrOptions,
     createdAt: url.createdAt! as string,
     updatedAt: url.updatedAt! as string
   };

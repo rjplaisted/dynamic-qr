@@ -81,4 +81,12 @@ UrlRouter.put('/update/:shortId', isUserAuthenticated, UrlValidator.Update, UrlC
 // DELETE /url/remove/{shortId}
 UrlRouter.delete('/remove/:shortId', isUserAuthenticated, UrlController.removeUrl);
 
+// user should be authenticated
+// GET /url/qr/{shortId}/svg - download QR as SVG
+UrlRouter.get('/qr/:shortId/svg', isUserAuthenticated, UrlController.downloadQrSvg);
+
+// user should be authenticated
+// GET /url/qr/{shortId}/png - download QR as PNG
+UrlRouter.get('/qr/:shortId/png', isUserAuthenticated, UrlController.downloadQrPng);
+
 export default UrlRouter;

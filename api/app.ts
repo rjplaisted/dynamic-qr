@@ -19,7 +19,7 @@ const workdir = path.dirname(fileURLToPath(import.meta.url));
 const staticAssets = express.static(path.join(workdir, 'ssr/'));
 app.use(staticAssets);
 
-app.set('trust proxy', '127.0.0.1');
+app.set('trust proxy', 1);
 app.use(json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));

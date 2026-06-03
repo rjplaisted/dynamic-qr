@@ -1,18 +1,33 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import * as z from 'zod';
 
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from "@/components/ui/button";
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { DependencyType } from '../ui/auto-form/interface';
 
+import QrDesigner from './QrDesigner.vue';
 import { useLinkStore, useNotifStore } from '@/stores';
-import type { LinkRequest } from '@/interfaces';
+import type { LinkRequest, QrOptions } from '@/interfaces';
 import { isShortUrl } from '@/utils/regex';
 
 const notifStore = useNotifStore();
 const linkStore = useLinkStore();
+
+const defaultQrOptions: QrOptions = {
+  darkColor: '#18181b',
+  lightColor: '#ffffff',
+  transparentBg: false,
+  moduleShape: 'square',
+  errorLevel: 'H',
+  frameText: '',
+  logo: '',
+};
 
 const newLinkSchema = z.object({
   title: z.string()
@@ -39,13 +54,11 @@ const newLinkSchema = z.object({
     .min(8, {message: 'Minimum 8 caharcters'}),
   description: z.string()
     .max(300, {message: 'Too long!'}),
-  plusQr: z.boolean()
 })
 .partial({
   isPrivate: true,
   password: true,
   description: true,
-  plusQr: true
 })
 .refine(data => {
   if (data.isPrivate && !data.password) return false;
@@ -59,8 +72,17 @@ const createForm = useForm({
   validationSchema: toTypedSchema(newLinkSchema)
 });
 
-const submitAction = async (v: LinkRequest) => {
-  const status = await linkStore.CreateLink(v);
+const plusQr = ref(false);
+const qrOptions = ref<Partial<QrOptions>>({ ...defaultQrOptions });
+
+const submitAction = async (v: Omit<LinkRequest, 'plusQr' | 'qrOptions'>) => {
+  const payload: LinkRequest = {
+    ...v,
+    plusQr: plusQr.value,
+    qrOptions: plusQr.value ? qrOptions.value : undefined,
+  };
+
+  const status = await linkStore.CreateLink(payload);
 
   if (status === 'success') notifStore.Notify({
     status: status,
@@ -109,10 +131,6 @@ const submitAction = async (v: LinkRequest) => {
         description: 'Let`s describe what this short is',
         component: 'textarea'
       },
-      plusQr: {
-        label: 'Plus QR code?',
-        description: 'This will generate a dynamic QR code linked to your short.'
-      }
     }"
     :dependencies="[
       {
@@ -130,9 +148,27 @@ const submitAction = async (v: LinkRequest) => {
     ]"
     @submit="submitAction">
 
+    <div class="space-y-4">
+      <Separator />
+
+      <div class="flex items-center gap-3">
+        <Switch
+          :checked="plusQr"
+          @update:checked="plusQr = $event"
+          :disabled="linkStore.loading"
+        />
+        <div>
+          <Label class="text-sm font-medium cursor-pointer">Generate QR Code</Label>
+          <p class="text-xs text-muted-foreground">This will generate a dynamic QR code linked to your short.</p>
+        </div>
+      </div>
+
+      <QrDesigner v-if="plusQr" v-model="qrOptions" />
+    </div>
+
     <Button type="submit" :disabled="linkStore.loading">
       {{ linkStore.loading ? 'Adding new link...' : 'Add new link'}}
     </Button>
-    
+
   </AutoForm>
 </template>

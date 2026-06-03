@@ -15,8 +15,8 @@ export const regNotUriFragment = /\/|:/;
 // https://stackoverflow.com/a/56393967
 export const regScheme = /([a-zA-Z]{1,20}):\/\/([\w_-]+(?:(?:\.[\w_-]+)?))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i;
 
-export const regShortFront = /(https?:\/\/)?(qr.)?coomi.codes\/o(?![^\/])\/?((?=.*$)[A-Za-z0-9_-]+)?/i;
-export const regShortBack = /(https?:\/\/)?api.coomi.codes\/qr\/o(?![^\/])\/?((?=.*$)[A-Za-z0-9_-]+)?/i;
+export const regShortFront = /(https?:\/\/)?qr-links\.resolvetasks\.com\/o\//i;
+export const regShortBack = /(https?:\/\/)?qr\.resolvetasks\.com\/o\//i;
 
 export const isEmailValid = (v: string) => regEmail.test(v);
 export const isUrlValid = (u: string) => regUrl.test(u) && regNotUriFragment.test(u);

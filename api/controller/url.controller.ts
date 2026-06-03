@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { createQr, UrlService } from '../services';
+import { createQr, createQrSvg, UrlService } from '../services';
 
 import { urlResponse } from '../transformer/response';
 import { ErrorCapture } from '../utils/error_capture';
@@ -21,7 +21,11 @@ export const createShortUrl = async (
     const url = UrlService.create(data);
 
     if (data.plusQr) {
-      url.qrCode = await createQr(url.shortUrl);
+      url.qrCode = await createQr(url.shortUrl, data.qrOptions);
+    }
+
+    if (data.qrOptions) {
+      url.qrOptions = data.qrOptions;
     }
 
     await UrlService.saveUpdate(url);
@@ -175,8 +179,14 @@ export const updateUrl = async (
 
     url.description = data.description ?? url.description;
 
+    if (data.qrOptions) {
+      url.qrOptions = data.qrOptions;
+    }
+
     if (!url.qrCode && data.plusQr) {
-      url.qrCode = await createQr(url.shortUrl);
+      url.qrCode = await createQr(url.shortUrl, data.qrOptions ?? url.qrOptions);
+    } else if (url.qrCode && data.qrOptions) {
+      url.qrCode = await createQr(url.shortUrl, data.qrOptions);
     }
 
     await UrlService.saveUpdate(url);
@@ -211,6 +221,46 @@ export const removeUrl = async (
 
     res.logMessage = `[${shortId}] deletion successful`;
     return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const downloadQrSvg = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const claimId = req.userId;
+    const { shortId } = req.params;
+    const url = (await UrlService.getSomeByOwner(claimId, { _id: shortId }))[0];
+    if (!url) throw new ErrorCapture('link not found in your account', 404);
+    const svg = await createQrSvg(url.shortUrl, url.qrOptions ?? {});
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Content-Disposition', `attachment; filename="qr-${shortId}.svg"`);
+    res.status(200).send(svg);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const downloadQrPng = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const claimId = req.userId;
+    const { shortId } = req.params;
+    const url = (await UrlService.getSomeByOwner(claimId, { _id: shortId }))[0];
+    if (!url) throw new ErrorCapture('link not found in your account', 404);
+    const dataUrl = url.qrCode ?? await createQr(url.shortUrl, url.qrOptions ?? {});
+    const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+    const buf = Buffer.from(base64, 'base64');
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', `attachment; filename="qr-${shortId}.png"`);
+    res.status(200).send(buf);
   } catch (error) {
     return next(error);
   }

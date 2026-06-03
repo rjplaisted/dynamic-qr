@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.2",
     "nanoid": "^5.0.7",
+    "express-rate-limit": "^8.5.2",
     "qrcode": "^1.5.4",
     "vue": "^3.5.6"
   },
