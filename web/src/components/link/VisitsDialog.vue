@@ -63,7 +63,7 @@ const formatLocation = (v: Visit) => {
       </button>
     </DialogTrigger>
 
-    <DialogContent class="max-w-2xl max-h-[80vh] flex flex-col">
+    <DialogContent class="max-w-2xl max-h-[80vh] flex flex-col z-[100]">
       <DialogHeader>
         <DialogTitle>View history</DialogTitle>
       </DialogHeader>

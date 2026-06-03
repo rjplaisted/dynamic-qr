@@ -57,8 +57,9 @@ const clearLogo = () => {
 };
 
 const previewSrc = computed(() => {
+  const url = props.previewUrl?.trim();
+  if (!url) return '';
   try {
-    const url = props.previewUrl?.trim() || 'https://example.com';
     return svgToDataUrl(generateQrSvg(url, model.value));
   } catch {
     return '';
@@ -77,15 +78,14 @@ const errorLevelDescriptions: Record<string, string> = {
   <div class="space-y-5 rounded-md border border-border p-4 bg-muted/30">
 
     <!-- Live Preview -->
-    <div class="flex flex-col items-center gap-2">
+    <div v-if="previewSrc" class="flex flex-col items-center gap-2">
       <Label class="text-sm font-medium text-muted-foreground">Preview</Label>
       <div
         class="rounded-lg border border-border p-3 flex items-center justify-center"
         :style="{ background: model.transparentBg ? 'repeating-conic-gradient(#e4e4e7 0% 25%, transparent 0% 50%) 0 0 / 12px 12px' : model.lightColor }"
       >
-        <img v-if="previewSrc" :src="previewSrc" alt="QR preview" class="w-40 h-auto" />
+        <img :src="previewSrc" alt="QR preview" class="w-40 h-auto" />
       </div>
-      <p class="text-xs text-muted-foreground">Live preview using a placeholder URL</p>
     </div>
 
     <!-- Colors Row -->

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
@@ -7,8 +7,6 @@ import * as z from 'zod';
 
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from "@/components/ui/button";
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { DependencyType } from '../ui/auto-form/interface';
 
@@ -73,10 +71,6 @@ const editLinkForm = useForm({
   }
 });
 
-// QR section: if link already has a QR code, show the designer immediately.
-// Otherwise show a toggle to generate one.
-const hasExistingQr = computed(() => !!link.value?.qrCode);
-const plusQr = ref(hasExistingQr.value);
 const qrOptions = ref<Partial<QrOptions>>({
   ...defaultQrOptions,
   ...(link.value?.qrOptions ?? {}),
@@ -85,8 +79,8 @@ const qrOptions = ref<Partial<QrOptions>>({
 const submitAction = async (v: Omit<UpdateLinkRequest, 'plusQr' | 'qrOptions'>) => {
   const payload: UpdateLinkRequest = {
     ...v,
-    plusQr: plusQr.value,
-    qrOptions: plusQr.value ? qrOptions.value : undefined,
+    plusQr: true,
+    qrOptions: qrOptions.value,
   };
 
   const status = await linkStore.UpdateLink(payload);
@@ -98,11 +92,6 @@ const submitAction = async (v: Omit<UpdateLinkRequest, 'plusQr' | 'qrOptions'>) 
   });
 };
 
-const resetAction = () => {
-  editLinkForm.resetForm();
-  plusQr.value = hasExistingQr.value;
-  qrOptions.value = { ...defaultQrOptions, ...(link.value?.qrOptions ?? {}) };
-};
 </script>
 
 <template>
@@ -169,27 +158,7 @@ const resetAction = () => {
 
     <div class="space-y-4">
       <Separator />
-
-      <div v-if="hasExistingQr">
-        <Label class="text-sm font-medium">QR Code Style</Label>
-        <p class="text-xs text-muted-foreground mb-3">Update the design of your existing QR code.</p>
-        <QrDesigner v-model="qrOptions" :preview-url="editLinkForm.values.originUrl ?? link?.originUrl" />
-      </div>
-
-      <template v-else>
-        <div class="flex items-center gap-3">
-          <Switch
-            :checked="plusQr"
-            @update:checked="plusQr = $event"
-            :disabled="loading"
-          />
-          <div>
-            <Label class="text-sm font-medium cursor-pointer">Generate QR Code</Label>
-            <p class="text-xs text-muted-foreground">This will generate a dynamic QR code linked to your short.</p>
-          </div>
-        </div>
-        <QrDesigner v-if="plusQr" v-model="qrOptions" :preview-url="editLinkForm.values.originUrl ?? link?.originUrl" />
-      </template>
+      <QrDesigner v-model="qrOptions" :preview-url="editLinkForm.values.originUrl ?? link?.originUrl" />
     </div>
 
     <DeleteLink />

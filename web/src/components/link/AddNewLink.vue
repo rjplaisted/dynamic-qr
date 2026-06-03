@@ -6,8 +6,6 @@ import * as z from 'zod';
 
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from "@/components/ui/button";
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { DependencyType } from '../ui/auto-form/interface';
 
@@ -72,14 +70,13 @@ const createForm = useForm({
   validationSchema: toTypedSchema(newLinkSchema)
 });
 
-const plusQr = ref(false);
 const qrOptions = ref<Partial<QrOptions>>({ ...defaultQrOptions });
 
 const submitAction = async (v: Omit<LinkRequest, 'plusQr' | 'qrOptions'>) => {
   const payload: LinkRequest = {
     ...v,
-    plusQr: plusQr.value,
-    qrOptions: plusQr.value ? qrOptions.value : undefined,
+    plusQr: true,
+    qrOptions: qrOptions.value,
   };
 
   const status = await linkStore.CreateLink(payload);
@@ -150,20 +147,7 @@ const submitAction = async (v: Omit<LinkRequest, 'plusQr' | 'qrOptions'>) => {
 
     <div class="space-y-4">
       <Separator />
-
-      <div class="flex items-center gap-3">
-        <Switch
-          :checked="plusQr"
-          @update:checked="plusQr = $event"
-          :disabled="linkStore.loading"
-        />
-        <div>
-          <Label class="text-sm font-medium cursor-pointer">Generate QR Code</Label>
-          <p class="text-xs text-muted-foreground">This will generate a dynamic QR code linked to your short.</p>
-        </div>
-      </div>
-
-      <QrDesigner v-if="plusQr" v-model="qrOptions" :preview-url="createForm.values.originUrl" />
+      <QrDesigner v-model="qrOptions" :preview-url="createForm.values.originUrl" />
     </div>
 
     <Button type="submit" :disabled="linkStore.loading">
