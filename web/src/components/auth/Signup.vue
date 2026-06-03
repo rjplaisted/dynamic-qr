@@ -179,7 +179,7 @@ const submitAction = async (values: any) => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="coomico@mail.co" v-bind="componentField" />
+                      <Input type="email" placeholder="email@example.com" v-bind="componentField" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -191,7 +191,7 @@ const submitAction = async (values: any) => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Coomico" v-bind="componentField" />
+                      <Input type="text" placeholder="Your Name" v-bind="componentField" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -201,7 +201,7 @@ const submitAction = async (values: any) => {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="coomico" v-bind="componentField"/>
+                      <Input type="text" placeholder="username" v-bind="componentField"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -3,9 +3,8 @@ export default function (html: string) {
 <html>
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="/o/coomico.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirect to a secret link &#128373</title>
+  <title>Redirecting...</title>
   <script type="module" src="/o/client.js"></script>
   <script type="importmap">
     {

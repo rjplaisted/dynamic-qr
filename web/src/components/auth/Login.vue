@@ -86,7 +86,7 @@ const changeLoginMethod = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="coomico@mail.co" v-bind="componentField" autocomplete="on" />
+                  <Input type="email" placeholder="email@example.com" v-bind="componentField" autocomplete="on" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -96,7 +96,7 @@ const changeLoginMethod = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="coomico" v-bind="componentField" autocomplete="on"/>
+                  <Input type="text" placeholder="username" v-bind="componentField" autocomplete="on"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
