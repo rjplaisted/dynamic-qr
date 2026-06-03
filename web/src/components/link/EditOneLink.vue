@@ -121,7 +121,7 @@ const resetAction = () => {
         }
       },
       originUrl: {
-        label: 'Original URL',
+        label: 'URL',
         description: 'Link to be targeted.',
         inputProps: {
           type: 'link',
@@ -173,7 +173,7 @@ const resetAction = () => {
       <div v-if="hasExistingQr">
         <Label class="text-sm font-medium">QR Code Style</Label>
         <p class="text-xs text-muted-foreground mb-3">Update the design of your existing QR code.</p>
-        <QrDesigner v-model="qrOptions" />
+        <QrDesigner v-model="qrOptions" :preview-url="editLinkForm.values.originUrl ?? link?.originUrl" />
       </div>
 
       <template v-else>
@@ -188,7 +188,7 @@ const resetAction = () => {
             <p class="text-xs text-muted-foreground">This will generate a dynamic QR code linked to your short.</p>
           </div>
         </div>
-        <QrDesigner v-if="plusQr" v-model="qrOptions" />
+        <QrDesigner v-if="plusQr" v-model="qrOptions" :preview-url="editLinkForm.values.originUrl ?? link?.originUrl" />
       </template>
     </div>
 
@@ -196,10 +196,7 @@ const resetAction = () => {
 
     <div class="flex gap-3">
       <Button type="submit" :disabled="loading">
-        {{ loading ? 'Saving...' : 'Save edits'}}
-      </Button>
-      <Button type="reset" variant="secondary" @click="resetAction">
-        Reset
+        {{ loading ? 'Saving...' : 'Save'}}
       </Button>
     </div>
 

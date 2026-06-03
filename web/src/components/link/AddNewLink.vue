@@ -107,7 +107,7 @@ const submitAction = async (v: Omit<LinkRequest, 'plusQr' | 'qrOptions'>) => {
         }
       },
       originUrl: {
-        label: 'Original URL',
+        label: 'URL',
         description: 'Link to be targeted.',
         inputProps: {
           type: 'link',
@@ -163,11 +163,11 @@ const submitAction = async (v: Omit<LinkRequest, 'plusQr' | 'qrOptions'>) => {
         </div>
       </div>
 
-      <QrDesigner v-if="plusQr" v-model="qrOptions" />
+      <QrDesigner v-if="plusQr" v-model="qrOptions" :preview-url="createForm.values.originUrl" />
     </div>
 
     <Button type="submit" :disabled="linkStore.loading">
-      {{ linkStore.loading ? 'Adding new link...' : 'Add new link'}}
+      {{ linkStore.loading ? 'Saving...' : 'Save'}}
     </Button>
 
   </AutoForm>

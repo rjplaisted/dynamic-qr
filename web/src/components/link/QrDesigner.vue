@@ -9,6 +9,7 @@ import { generateQrSvg, svgToDataUrl } from '@/utils/qrgen';
 
 const props = defineProps<{
   modelValue: Partial<QrOptions>
+  previewUrl?: string
 }>();
 
 const emit = defineEmits<{
@@ -57,7 +58,8 @@ const clearLogo = () => {
 
 const previewSrc = computed(() => {
   try {
-    return svgToDataUrl(generateQrSvg('https://example.com', model.value));
+    const url = props.previewUrl?.trim() || 'https://example.com';
+    return svgToDataUrl(generateQrSvg(url, model.value));
   } catch {
     return '';
   }
