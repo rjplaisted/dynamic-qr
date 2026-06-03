@@ -29,7 +29,7 @@ services:
         - API_URL=${API_URL}
       target: prod
     expose:
-      - "3003"
+      - "80"
 
   mongodb:
     container_name: mongodb
