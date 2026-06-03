@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import type { QrOptions } from '@/interfaces';
+import { generateQrSvg, svgToDataUrl } from '@/utils/qrgen';
 
 const props = defineProps<{
   modelValue: Partial<QrOptions>
@@ -54,6 +55,14 @@ const clearLogo = () => {
   if (logoInputRef.value) logoInputRef.value.value = '';
 };
 
+const previewSrc = computed(() => {
+  try {
+    return svgToDataUrl(generateQrSvg('https://example.com', model.value));
+  } catch {
+    return '';
+  }
+});
+
 const errorLevelDescriptions: Record<string, string> = {
   L: 'Low — up to 7% damage recovery',
   M: 'Medium — up to 15% damage recovery',
@@ -64,6 +73,18 @@ const errorLevelDescriptions: Record<string, string> = {
 
 <template>
   <div class="space-y-5 rounded-md border border-border p-4 bg-muted/30">
+
+    <!-- Live Preview -->
+    <div class="flex flex-col items-center gap-2">
+      <Label class="text-sm font-medium text-muted-foreground">Preview</Label>
+      <div
+        class="rounded-lg border border-border p-3 flex items-center justify-center"
+        :style="{ background: model.transparentBg ? 'repeating-conic-gradient(#e4e4e7 0% 25%, transparent 0% 50%) 0 0 / 12px 12px' : model.lightColor }"
+      >
+        <img v-if="previewSrc" :src="previewSrc" alt="QR preview" class="w-40 h-auto" />
+      </div>
+      <p class="text-xs text-muted-foreground">Live preview using a placeholder URL</p>
+    </div>
 
     <!-- Colors Row -->
     <div class="grid grid-cols-2 gap-4">
