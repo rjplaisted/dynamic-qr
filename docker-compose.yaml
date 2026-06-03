@@ -45,7 +45,13 @@ services:
       - "27017"
     networks:
       - mongo-network
+    volumes:
+      - qr-mongodb-data:/data/db
 
 networks:
   mongo-network:
     name: mongo-network
+
+volumes:
+  qr-mongodb-data:
+    name: qr-mongodb-data
