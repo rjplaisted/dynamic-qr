@@ -111,7 +111,7 @@ const UrlSchema = new Schema<IUrl>({
       country: { type: String, default: '' },
       city: { type: String, default: '' },
       region: { type: String, default: '' },
-      geoStatus: { type: String, default: 'queued' },
+      geoStatus: { type: String },
     }],
     default: [],
     _id: false,
