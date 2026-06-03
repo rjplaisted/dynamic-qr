@@ -11,6 +11,13 @@ import bcrypt from "bcryptjs";
 
 import { ErrorCapture } from "../utils/error_capture";
 
+export interface IVisit {
+  at: Date;
+  ip: string;
+  country: string;
+  city: string;
+}
+
 export interface IUrl extends Document, SchemaTimestampsConfig {
   title: string,
   shortUrl: string,
@@ -31,6 +38,7 @@ export interface IUrl extends Document, SchemaTimestampsConfig {
     frameText?: string;
     logo?: string;
   },
+  visits: IVisit[],
   owner: ObjectId,
   comparePassword(password: string): Promise<boolean>,
   comparePassKey(passKey: string): boolean
@@ -92,6 +100,16 @@ const UrlSchema = new Schema<IUrl>({
       logo: String,
     },
     required: false,
+    _id: false,
+  },
+  visits: {
+    type: [{
+      at: { type: Date, required: true },
+      ip: { type: String, required: true },
+      country: { type: String, default: '' },
+      city: { type: String, default: '' },
+    }],
+    default: [],
     _id: false,
   },
   owner: {

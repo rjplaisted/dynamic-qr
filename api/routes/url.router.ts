@@ -83,6 +83,7 @@ UrlRouter.delete('/remove/:shortId', isUserAuthenticated, UrlController.removeUr
 
 // user should be authenticated
 // GET /url/qr/{shortId}/svg - download QR as SVG
+UrlRouter.get('/visits/:shortId', isUserAuthenticated, UrlController.getUrlVisits);
 UrlRouter.get('/qr/:shortId/svg', isUserAuthenticated, UrlController.downloadQrSvg);
 
 // user should be authenticated

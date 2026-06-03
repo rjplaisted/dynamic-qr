@@ -34,7 +34,7 @@ export const getById = async (id: string | ObjectId) => {
 };
 
 export const getSomeByOwner = async (ownerId: string | ObjectId, filter?: object) => {
-  const urls = await UrlDB.find(Object.assign({ owner: ownerId }, filter), '-owner').sort(
+  const urls = await UrlDB.find(Object.assign({ owner: ownerId }, filter), '-owner -visits').sort(
     '-updatedAt',
   );
 

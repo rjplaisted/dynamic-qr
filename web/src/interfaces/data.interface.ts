@@ -29,6 +29,13 @@ export interface Link {
   updatedAt: string
 }
 
+export interface Visit {
+  at: string;
+  ip: string;
+  country: string;
+  city: string;
+}
+
 export interface Notif {
   status: 'success' | 'error',
   title?: string,

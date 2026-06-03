@@ -15,6 +15,7 @@ import { Icon } from "@iconify/vue";
 
 import type { Link } from "@/interfaces";
 import { downloadLinkQrSvg, downloadLinkQrPng } from "@/api";
+import VisitsDialog from './VisitsDialog.vue';
 
 defineProps<{
   link: Link
@@ -92,11 +93,10 @@ const onDownloadPng = async (link: Link) => {
       <img v-else src="/src/assets/error/no-picture.png" alt="no-qr-code" class="w-auto h-24"/>
     </CardContent>
     <CardFooter class="bottom-0 py-4">
-      <small class="inline-flex items-center text-muted-foreground gap-1">
-        <Icon icon="radix-icons:eye-open" />
-        {{ link.visitCount }}
+      <small class="inline-flex items-center text-muted-foreground gap-2">
+        <VisitsDialog :link-id="link._id" :visit-count="link.visitCount" />
         <Icon icon="radix-icons:divider-horizontal" />
-          {{ formatTimeAgo(new Date(moment.utc().format(link.updatedAt))) }}
+        {{ formatTimeAgo(new Date(moment.utc().format(link.updatedAt))) }}
       </small>
     </CardFooter>
   </Card>

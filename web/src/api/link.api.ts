@@ -4,6 +4,7 @@ import type {
   MetaLink,
   SuccessResponse,
   UpdateLinkRequest,
+  Visit,
 } from '@/interfaces';
 import api, { createConfig, TIMEOUT } from './api';
 
@@ -43,6 +44,13 @@ export const updateLink = async (
 export const deleteLink = async (linkId: string) => {
   return await api.delete(
     `/url/remove/${linkId}`,
+    createConfig({ requireAuth: true }),
+  );
+};
+
+export const fetchLinkVisits = async (linkId: string) => {
+  return await api.get<SuccessResponse<Visit[]>>(
+    `/url/visits/${linkId}`,
     createConfig({ requireAuth: true }),
   );
 };

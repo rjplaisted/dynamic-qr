@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import geoip from 'geoip-lite';
 
 import { createQr, createQrSvg, UrlService } from '../services';
+import { UrlDB } from '../models';
 
 import { urlResponse } from '../transformer/response';
 import { ErrorCapture } from '../utils/error_capture';
@@ -76,6 +78,10 @@ export const getOriginUrl = async (
     }
 
     url.visitCount += 1;
+    const rawIp = req.ip || 'unknown';
+    const ip = rawIp.replace('::ffff:', '');
+    const geo = geoip.lookup(ip);
+    url.visits.push({ at: new Date(), ip, country: geo?.country || '', city: geo?.city || '' });
     await UrlService.saveUpdate(url, { timestamps: false });
 
     res.content = {
@@ -220,6 +226,25 @@ export const removeUrl = async (
     };
 
     res.logMessage = `[${shortId}] deletion successful`;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getUrlVisits = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const claimId = req.userId;
+    const { shortId } = req.params;
+    const url = await UrlDB.findOne({ _id: shortId, owner: claimId }, 'visits');
+    if (!url) throw new ErrorCapture('link not found in your account', 404);
+    const visits = [...url.visits].sort((a, b) => b.at.getTime() - a.at.getTime());
+    res.content = { status: 'success', code: 200, data: visits };
+    res.logMessage = `${claimId} fetched visits for ${shortId}`;
     return next();
   } catch (error) {
     return next(error);
