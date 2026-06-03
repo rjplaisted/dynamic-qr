@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import geoip from 'geoip-lite';
 
-import { createQr, createQrSvg, UrlService } from '../services';
+import { createQr, createQrSvg, UrlService, enqueueGeoLookup } from '../services';
 import { UrlDB } from '../models';
 
 import { urlResponse } from '../transformer/response';
@@ -80,9 +79,10 @@ export const getOriginUrl = async (
     url.visitCount += 1;
     const rawIp = req.ip || 'unknown';
     const ip = rawIp.replace('::ffff:', '');
-    const geo = geoip.lookup(ip);
-    url.visits.push({ at: new Date(), ip, country: geo?.country || '', city: geo?.city || '' });
+    const visitAt = new Date();
+    url.visits.push({ at: visitAt, ip, country: '', city: '', region: '', geoStatus: 'queued' });
     await UrlService.saveUpdate(url, { timestamps: false });
+    enqueueGeoLookup(url.id, ip, visitAt);
 
     res.content = {
       status: 'redirect',

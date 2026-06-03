@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Icon } from '@iconify/vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,33 +21,51 @@ const open = ref(false);
 const visits = ref<Visit[]>([]);
 const loading = ref(false);
 
-const onOpen = async (val: boolean) => {
-  open.value = val;
-  if (val && visits.value.length === 0) {
-    loading.value = true;
-    try {
-      const res = await fetchLinkVisits(props.linkId);
-      visits.value = res.data.data;
-    } finally {
-      loading.value = false;
-    }
+const hasQueued = computed(() => visits.value.some(v => v.geoStatus === 'queued'));
+
+let pollTimer: ReturnType<typeof setTimeout> | null = null;
+
+const load = async () => {
+  loading.value = true;
+  try {
+    const res = await fetchLinkVisits(props.linkId);
+    visits.value = res.data.data;
+  } finally {
+    loading.value = false;
   }
 };
 
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+const schedulePoll = () => {
+  if (pollTimer) clearTimeout(pollTimer);
+  if (!open.value || !hasQueued.value) return;
+  // Poll every 3s while there are queued entries
+  pollTimer = setTimeout(async () => {
+    await load();
+    schedulePoll();
+  }, 3000);
 };
 
-const formatTime = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+const onOpen = async (val: boolean) => {
+  open.value = val;
+  if (val) {
+    await load();
+    schedulePoll();
+  } else {
+    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    visits.value = [];
+  }
 };
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+const formatTime = (iso: string) =>
+  new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 const formatLocation = (v: Visit) => {
-  if (v.city && v.country) return `${v.city}, ${v.country}`;
-  if (v.country) return v.country;
-  return '—';
+  if (v.geoStatus === 'queued') return 'Queued...';
+  const parts = [v.city, v.region, v.country].filter(Boolean);
+  return parts.length ? parts.join(', ') : '—';
 };
 </script>
 
@@ -56,7 +74,7 @@ const formatLocation = (v: Visit) => {
     <DialogTrigger as-child>
       <button
         class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        :title="`${visitCount} views — click to see details`"
+        :title="`${visitCount} views — click for details`"
       >
         <Icon icon="radix-icons:eye-open" />
         {{ visitCount }}
@@ -65,11 +83,16 @@ const formatLocation = (v: Visit) => {
 
     <DialogContent class="max-w-2xl max-h-[80vh] flex flex-col z-[100]">
       <DialogHeader>
-        <DialogTitle>View history</DialogTitle>
+        <DialogTitle class="flex items-center gap-2">
+          View history
+          <span v-if="hasQueued" class="text-xs font-normal text-muted-foreground animate-pulse">
+            — resolving locations...
+          </span>
+        </DialogTitle>
       </DialogHeader>
 
       <div class="flex-1 overflow-auto">
-        <div v-if="loading" class="flex justify-center py-8 text-muted-foreground text-sm">
+        <div v-if="loading && visits.length === 0" class="flex justify-center py-8 text-muted-foreground text-sm">
           Loading...
         </div>
 
@@ -97,7 +120,9 @@ const formatLocation = (v: Visit) => {
               <td class="py-2 pr-4">{{ formatDate(v.at) }}</td>
               <td class="py-2 pr-4 tabular-nums">{{ formatTime(v.at) }}</td>
               <td class="py-2 pr-4 font-mono text-xs">{{ v.ip }}</td>
-              <td class="py-2">{{ formatLocation(v) }}</td>
+              <td class="py-2" :class="v.geoStatus === 'queued' ? 'text-muted-foreground italic text-xs' : ''">
+                {{ formatLocation(v) }}
+              </td>
             </tr>
           </tbody>
         </table>

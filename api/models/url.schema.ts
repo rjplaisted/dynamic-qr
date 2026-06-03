@@ -16,6 +16,8 @@ export interface IVisit {
   ip: string;
   country: string;
   city: string;
+  region: string;
+  geoStatus: 'queued' | 'done' | 'failed';
 }
 
 export interface IUrl extends Document, SchemaTimestampsConfig {
@@ -108,6 +110,8 @@ const UrlSchema = new Schema<IUrl>({
       ip: { type: String, required: true },
       country: { type: String, default: '' },
       city: { type: String, default: '' },
+      region: { type: String, default: '' },
+      geoStatus: { type: String, default: 'queued' },
     }],
     default: [],
     _id: false,

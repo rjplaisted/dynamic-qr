@@ -34,6 +34,8 @@ export interface Visit {
   ip: string;
   country: string;
   city: string;
+  region: string;
+  geoStatus?: 'queued' | 'done' | 'failed';
 }
 
 export interface Notif {
