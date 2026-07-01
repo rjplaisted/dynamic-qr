@@ -2,7 +2,6 @@ import express, { Application, json, NextFunction, Request, Response, urlencoded
 import http from 'http';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 
 import ConnectDB from './config/db.config';
@@ -15,8 +14,7 @@ import { apiPort } from './utils/envs';
 const app: Application = express();
 const server: http.Server = http.createServer(app);
 
-const workdir = path.dirname(fileURLToPath(import.meta.url));
-const staticAssets = express.static(path.join(workdir, 'ssr/'));
+const staticAssets = express.static(path.join(__dirname, 'ssr/'));
 app.use(staticAssets);
 
 app.set('trust proxy', 1);

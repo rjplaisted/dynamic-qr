@@ -10,6 +10,7 @@ import { MongoError } from "mongodb";
 import bcrypt from "bcryptjs";
 
 import { ErrorCapture } from "../utils/error_capture";
+import type { QrStyle } from "../services/qr.service";
 
 export interface IVisit {
   at: Date;
@@ -20,7 +21,7 @@ export interface IVisit {
   geoStatus: 'queued' | 'done' | 'failed';
 }
 
-export interface IUrl extends Document, SchemaTimestampsConfig {
+export interface IUrl extends Document<string>, SchemaTimestampsConfig {
   title: string,
   shortUrl: string,
   originUrl: string,
@@ -31,15 +32,7 @@ export interface IUrl extends Document, SchemaTimestampsConfig {
   description?: string,
   visitCount: number,
   qrCode?: string,
-  qrOptions?: {
-    darkColor?: string;
-    lightColor?: string;
-    transparentBg?: boolean;
-    moduleShape?: string;
-    errorLevel?: string;
-    frameText?: string;
-    logo?: string;
-  },
+  qrOptions?: QrStyle,
   visits: IVisit[],
   owner: ObjectId,
   comparePassword(password: string): Promise<boolean>,
@@ -132,7 +125,7 @@ const hasPassword = (schema: Schema, options: SchemaOptions) => {
 
 UrlSchema.plugin(hasPassword);
 
-UrlSchema.pre('save', async function(next) {
+UrlSchema.pre('save', async function(this: IUrl, next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -155,18 +148,18 @@ UrlSchema.post('save', { errorHandler: true}, function(error, doc, next) {
   }
 });
 
-UrlSchema.method('comparePassword', async function(password: string) {
+UrlSchema.method('comparePassword', async function(this: IUrl, password: string) {
   if (!this.isPrivate || !password) {
     throw new ErrorCapture('link is not private or has no password');
   }
 
   if (!this.password) return false;
-  
+
   const match = await bcrypt.compare(password, this.password);
   return match;
 });
 
-UrlSchema.method('comparePassKey', function (passKey: string) {
+UrlSchema.method('comparePassKey', function (this: IUrl, passKey: string) {
   return passKey === this.passKey;
 });
 
