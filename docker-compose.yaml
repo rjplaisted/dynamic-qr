@@ -5,6 +5,9 @@ services:
     image: qr-api
     container_name: qr-api
     build: api
+    restart: unless-stopped
+    labels:
+      - autoheal=true
     env_file:
       - ./.env
     environment:
@@ -21,6 +24,7 @@ services:
   qr-web:
     image: qr-web
     container_name: qr-web
+    restart: unless-stopped
     env_file:
       - ./.env
     build:
@@ -30,6 +34,15 @@ services:
       target: prod
     expose:
       - "80"
+
+  autoheal:
+    image: willfarrell/autoheal
+    container_name: autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   mongodb:
     container_name: mongodb
