@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import * as z from 'zod';
@@ -18,7 +18,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -127,14 +126,6 @@ const changeLoginMethod = () => {
         </Button>
       </div>
     </CardContent>
-
-    <CardFooter>
-      <small class="text-muted-foreground">Not have an account? 
-        <RouterLink to="/signup" class="underline">
-          Sign up here
-        </RouterLink>
-      </small>
-    </CardFooter>
   </Card>
 
 </template>

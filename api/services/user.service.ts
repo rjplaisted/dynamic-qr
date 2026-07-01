@@ -1,6 +1,8 @@
 import { IUser, UserDB } from "../models";
 
 import { ErrorCapture } from "../utils/error_capture";
+import { defaultPassword, defaultUser } from "../utils/envs";
+import { logTimestamp } from "../utils/log";
 
 export const create = async (data: IUser) => {
   let user = new UserDB({
@@ -49,4 +51,20 @@ export const destroy = async (data: IUser) => {
   });
 
   if (!res.deletedCount) throw new ErrorCapture('user does not exist', 404);
+};
+
+export const seedDefaultUser = async () => {
+  if (!defaultUser || !defaultPassword) return;
+
+  const exists = await UserDB.findOne({ email: defaultUser });
+  if (exists) return;
+
+  await create({
+    name: defaultUser,
+    username: defaultUser,
+    email: defaultUser,
+    password: defaultPassword,
+  } as IUser);
+
+  logTimestamp(`seeded default user ${defaultUser}`);
 };

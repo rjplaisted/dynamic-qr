@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import ConnectDB from './config/db.config';
 import { AuthRouter, OriginUrlRouter, UrlRouter, UserRouter } from './routes';
 import { ErrorHandler, ResponseHandler, Logger } from './middlewares';
+import { UserService } from './services';
 
 import { corsOptions } from './utils/cors.options';
 import { apiPort } from './utils/envs';
@@ -42,6 +43,7 @@ app.use(staticAssets);
 
 async function run() {
   await ConnectDB();
+  await UserService.seedDefaultUser();
   server.listen(apiPort, () => {
   console.log(`server running on port: ${apiPort}`);
 });

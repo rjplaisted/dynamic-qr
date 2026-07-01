@@ -35,14 +35,6 @@ const router = createRouter({
             title: 'Login to your account |'
           },
           component: () => import('../views/home/LoginView.vue')
-        },
-        {
-          path: 'signup',
-          name: 'signup',
-          meta: {
-            title: 'Create an account |'
-          },
-          component: () => import('../views/home/SignupView.vue')
         }
       ]
     },

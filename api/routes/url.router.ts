@@ -45,7 +45,7 @@ UrlRouter.post('/new', isUserAuthenticated, UrlValidator.Create, UrlController.c
 //     updatedAt
 //   }
 // }
-UrlRouter.get('/one/:shortId', isUserAuthenticated, UrlController.getOneOwnedUrl);
+UrlRouter.get('/one/:shortId', isUserAuthenticated, UrlController.getOneUrl);
 
 // user should be authenticated
 // GET /url/all
@@ -70,7 +70,7 @@ UrlRouter.get('/one/:shortId', isUserAuthenticated, UrlController.getOneOwnedUrl
 //     data_length
 //   }
 // }
-UrlRouter.get('/all', isUserAuthenticated, UrlController.getAllOwnedUrls);
+UrlRouter.get('/all', isUserAuthenticated, UrlController.getAllUrls);
 
 // user should be authenticated
 // PUT /url/update/{shortId}

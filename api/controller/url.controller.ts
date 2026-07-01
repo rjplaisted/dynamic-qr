@@ -95,7 +95,7 @@ export const getOriginUrl = async (
   }
 };
 
-export const getOneOwnedUrl = async (
+export const getOneUrl = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -104,9 +104,7 @@ export const getOneOwnedUrl = async (
     const claimId = req.userId;
     const { shortId } = req.params;
 
-    const url = (await UrlService.getSomeByOwner(claimId, { _id: shortId }))[0];
-    if (!url)
-      throw new ErrorCapture('the link was not found in your account', 404);
+    const url = await UrlService.getById(shortId);
 
     res.content = {
       status: 'success',
@@ -122,7 +120,7 @@ export const getOneOwnedUrl = async (
 };
 
 // TODO: implement pagination
-export const getAllOwnedUrls = async (
+export const getAllUrls = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -130,7 +128,7 @@ export const getAllOwnedUrls = async (
   try {
     const claimId = req.userId;
 
-    const urls = await UrlService.getSomeByOwner(claimId);
+    const urls = await UrlService.getSome();
 
     res.content = {
       status: 'success',
@@ -141,7 +139,7 @@ export const getAllOwnedUrls = async (
       },
     };
 
-    res.logMessage = `${claimId} fetch all owned urls`;
+    res.logMessage = `${claimId} fetch all urls`;
     return next();
   } catch (error) {
     return next(error);
@@ -159,11 +157,6 @@ export const updateUrl = async (
     const { shortId } = req.params;
 
     const url = await UrlService.getById(shortId);
-    if (claimId !== url.owner.toString())
-      throw new ErrorCapture(
-        'you are not allowed to update links that are not yours',
-        409,
-      );
 
     url.title = data.title ?? url.title;
     url.originUrl = data.originUrl ?? url.originUrl;
@@ -218,14 +211,14 @@ export const removeUrl = async (
     const claimId = req.userId;
     const { shortId } = req.params;
 
-    await UrlService.destroy(shortId, claimId);
+    await UrlService.destroy(shortId);
 
     res.content = {
       status: 'empty',
       code: 205,
     };
 
-    res.logMessage = `[${shortId}] deletion successful`;
+    res.logMessage = `[${shortId}] deletion successful, by ${claimId}`;
     return next();
   } catch (error) {
     return next(error);
@@ -240,8 +233,8 @@ export const getUrlVisits = async (
   try {
     const claimId = req.userId;
     const { shortId } = req.params;
-    const url = await UrlDB.findOne({ _id: shortId, owner: claimId }, 'visits');
-    if (!url) throw new ErrorCapture('link not found in your account', 404);
+    const url = await UrlDB.findOne({ _id: shortId }, 'visits');
+    if (!url) throw new ErrorCapture('link not found', 404);
     const visits = [...url.visits].sort((a, b) => b.at.getTime() - a.at.getTime());
     res.content = { status: 'success', code: 200, data: visits };
     res.logMessage = `${claimId} fetched visits for ${shortId}`;
@@ -257,10 +250,8 @@ export const downloadQrSvg = async (
   next: NextFunction,
 ) => {
   try {
-    const claimId = req.userId;
     const { shortId } = req.params;
-    const url = (await UrlService.getSomeByOwner(claimId, { _id: shortId }))[0];
-    if (!url) throw new ErrorCapture('link not found in your account', 404);
+    const url = await UrlService.getById(shortId);
     const svg = await createQrSvg(url.shortUrl, url.qrOptions ?? {});
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Content-Disposition', `attachment; filename="qr-${shortId}.svg"`);
@@ -276,10 +267,8 @@ export const downloadQrPng = async (
   next: NextFunction,
 ) => {
   try {
-    const claimId = req.userId;
     const { shortId } = req.params;
-    const url = (await UrlService.getSomeByOwner(claimId, { _id: shortId }))[0];
-    if (!url) throw new ErrorCapture('link not found in your account', 404);
+    const url = await UrlService.getById(shortId);
     const dataUrl = url.qrCode ?? await createQr(url.shortUrl, url.qrOptions ?? {});
     const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
     const buf = Buffer.from(base64, 'base64');

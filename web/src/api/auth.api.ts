@@ -1,5 +1,4 @@
 import type {
-  AuthRequest,
   SuccessResponse,
   DataAuth,
   MetaAuth,
@@ -7,14 +6,6 @@ import type {
   LoginUsernameRequest,
 } from '@/interfaces';
 import api, { createConfig, TIMEOUT } from './api';
-
-export const regist = async (registData: AuthRequest) => {
-  return await api.post<SuccessResponse<DataAuth, MetaAuth>>(
-    '/auth/regist',
-    registData,
-    createConfig(),
-  );
-};
 
 export const loginEmail = async (loginEmailData: LoginEmailRequest) => {
   return await api.post<SuccessResponse<DataAuth, MetaAuth>>(

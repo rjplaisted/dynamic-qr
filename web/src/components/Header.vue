@@ -40,12 +40,7 @@ const enableComponent = (...route: string[]) => {
             Get Dynamic QR
           </RouterLink>
         </Button>
-        <Button as-child :class="enableComponent('home', 'login')">
-          <RouterLink to="/signup">
-            Sign Up
-          </RouterLink>
-        </Button>
-        <Button variant="outline" as-child :class="enableComponent('home', 'signup')">
+        <Button variant="outline" as-child :class="enableComponent('home')">
           <RouterLink to="/login">
             Login
           </RouterLink>
@@ -70,14 +65,6 @@ const enableComponent = (...route: string[]) => {
               <RouterLink to="/links">
                 Get Dynamic QR
                 <QrIcon />
-              </RouterLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem as-child class="justify-between">
-              <RouterLink to="/signup">
-                Sign Up
-                <Icon icon="radix-icons:person">
-                  <span sr-only>Sign Up</span>
-                </Icon>
               </RouterLink>
             </DropdownMenuItem>
             <DropdownMenuItem as-child class="justify-between">

@@ -4,7 +4,6 @@ import { nanoid } from 'nanoid';
 import { IUrl, UrlDB } from '../models';
 
 import { ErrorCapture } from '../utils/error_capture';
-import { logTimestamp } from '../utils/log';
 import { apiUrl } from '../utils/envs';
 
 export const create = (data: IUrl) => {
@@ -33,10 +32,8 @@ export const getById = async (id: string | ObjectId) => {
   return url;
 };
 
-export const getSomeByOwner = async (ownerId: string | ObjectId, filter?: object) => {
-  const urls = await UrlDB.find(Object.assign({ owner: ownerId }, filter), '-owner -visits').sort(
-    '-updatedAt',
-  );
+export const getSome = async (filter?: object) => {
+  const urls = await UrlDB.find(filter ?? {}, '-owner -visits').sort('-updatedAt');
 
   return urls;
 };
@@ -52,17 +49,8 @@ export const saveUpdate = async (url: IUrl, options?: SaveOptions) => {
   return url;
 };
 
-export const destroy = async (shortId: string | ObjectId, ownerId: string | ObjectId) => {
-  const res = await UrlDB.deleteOne({
-    _id: shortId,
-    owner: ownerId,
-  });
+export const destroy = async (shortId: string | ObjectId) => {
+  const res = await UrlDB.deleteOne({ _id: shortId });
 
-  if (!res.deletedCount) throw new ErrorCapture('link is not exist in your account', 404);
-};
-
-export const destroyAllOwned = (ownerId: string | ObjectId) => {
-  UrlDB.deleteMany({ owner: ownerId }).then((res) =>
-    logTimestamp(`Successfully removed ${res.deletedCount} urls belonging to ${ownerId}`),
-  );
+  if (!res.deletedCount) throw new ErrorCapture('link does not exist', 404);
 };

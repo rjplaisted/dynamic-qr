@@ -14,6 +14,12 @@ export const dbHost = process.env.DB_HOST;
 export const dbPort = process.env.DB_PORT;
 export const dbName = process.env.DB_NAME;
 
+export const allowSignup = process.env.ALLOW_SIGNUP !== 'false';
+
+// if set, this account is created on startup when no user with this email exists yet
+export const defaultUser = process.env.DEFAULT_USER;
+export const defaultPassword = process.env.DEFAULT_PASSWORD;
+
 // all exp number is seconds unit
 export const originKey: string = process.env.ORIGIN_KEY!;
 export const originExp: number = +process.env.ORIGIN_EXP!;

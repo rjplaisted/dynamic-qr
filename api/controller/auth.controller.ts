@@ -8,7 +8,7 @@ import { AuthHandler } from '../middlewares';
 import { userResponse } from '../transformer/response';
 import { ErrorCapture } from '../utils/error_capture';
 import { schemeFiller } from '../utils/filler';
-import { accessExp, originExp, refreshKey, webHost } from '../utils/envs';
+import { accessExp, allowSignup, originExp, refreshKey, webHost } from '../utils/envs';
 
 //USER AUTHENTICATION
 export const regist = async (
@@ -17,6 +17,8 @@ export const regist = async (
     next: NextFunction
 ) => {
     try {
+        if (!allowSignup) throw new ErrorCapture('registration is disabled', 403);
+
         const user = await UserService.create(req.body);
         const accessToken = AuthHandler.createAccessToken(user.id);
         const { refreshToken, refreshTokenHash } =

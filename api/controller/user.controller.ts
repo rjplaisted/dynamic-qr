@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import crypto from 'crypto';
 
-import { UrlService, UserService } from '../services';
+import { UserService } from '../services';
 import { cookieOptions } from '../middlewares/auth.handler';
 
 import { userResponse } from '../transformer/response';
@@ -166,7 +166,6 @@ export const removeUser = async (
     const match = await user.comparePassword(password);
     if (!match) throw new ErrorCapture('password does not match', 401);
 
-    UrlService.destroyAllOwned(user.id);
     await UserService.destroy(user);
 
     res.cookie(

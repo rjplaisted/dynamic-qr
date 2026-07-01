@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import type { AuthRequest, LoginEmailRequest, LoginUsernameRequest } from '@/interfaces';
-import { loginEmail, loginUsername, refreshToken, regist } from '@/api';
+import type { LoginEmailRequest, LoginUsernameRequest } from '@/interfaces';
+import { loginEmail, loginUsername, refreshToken } from '@/api';
 import { useAccountStore } from './account.store';
 
 import { AuthStorage } from '@/utils/storage';
@@ -26,29 +26,6 @@ export const useAuthStore = defineStore('auth', () => {
   function EmptyingAuth() {
     auth.value = undefined;
     AuthStorage.removeAuth();
-  }
-
-  async function Regist(registData: AuthRequest) {
-    loading.value = true;
-
-    try {
-      const {
-        status,
-        data: { data },
-      } = await regist(registData);
-      const { token, ...account } = data;
-
-      const accountStore = useAccountStore();
-      accountStore.ReplaceAccount(account);
-
-      ReplaceAuth(token);
-
-      return codeToStatus(status);
-    } catch (error) {
-      throw error;
-    } finally {
-      loading.value = false;
-    }
   }
 
   async function LoginEmail(loginData: LoginEmailRequest) {
@@ -116,7 +93,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     ReplaceAuth,
     EmptyingAuth,
-    Regist,
     LoginEmail,
     LoginUsername,
     RefreshToken,
